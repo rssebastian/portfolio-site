@@ -1,13 +1,23 @@
 //const keys = require('../config/keys');
 const mongoose = require('mongoose');
-const { check,validationResult } = require('express-validator/check');
-const { sanitizeBody } = require('express-validator/filter');
+const config = require('config');
+const db = config.get('mongoURI');
+const sendGridKey = config.get('sendGridKey');
+const emailAddress = config.get('emailAddress');
 
-mongoose.connect(process.env.mongoURI);
+const { check,validationResult } = require('express-validator');
+const { sanitizeBody } = require('express-validator');
+
+mongoose.connect(process.env.mongoURI || db, {useNewUrlParser: true}, () => {
+    console.log('MongoDB Connected...');
+});
 require('../models/email');
 const Email = mongoose.model('emails');
 const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.sendGrid);
+// sgMail.setApiKey(process.env.sendGrid || sendGridKey);
+// console.log(process.env.sendGridKey);
+// console.log(sendGridKey);
+sgMail.setApiKey(process.env.sendGridKey || sendGridKey);
 
 
 module.exports = app => {
@@ -40,7 +50,7 @@ module.exports = app => {
         });
 
         const msg = {
-            to: process.env.emailAddress,
+            to: process.env.emailAddress || emailAddress,
             from: req.body.email,
             emailAddress: req.body.email,
             subject: req.body.subject,

@@ -1,3 +1,5 @@
 node_modules/
 config/default.json
-config/keys.js
+config/keys.jssendgrid.env
+client/src/keys
+sendgrid.env
